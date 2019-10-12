@@ -1,51 +1,36 @@
 import React from 'react';
-import * as Facebook from 'expo-facebook';
-import { StyleSheet, Text, Button, View , Alert} from 'react-native';
+import {SwitchNav} from './Screens/ChatNavigation'
+import * as Font from 'expo-font';
+import { Ionicons } from '@expo/vector-icons';
+import { AppLoading } from 'expo';
+import { Container, Text } from 'native-base';
 
 export default class App extends React.Component {
-  constructor() {
-    super()
+  constructor(props) {
+    super(props);
+    this.state = {
+      isReady: false,
+    };
   }
 
-  async logIn() {
-    try {
-      const {
-        type,
-        token,
-        expires,
-        permissions,
-        declinedPermissions,
-      } = await Facebook.logInWithReadPermissionsAsync('2424831034261370', {
-        permissions: ['public_profile'],
-      });
-      if (type === 'success') {
-        // Get the user's name using Facebook's Graph API
-        const response = await fetch(`https://graph.facebook.com/me?access_token=${token}`);
-        Alert.alert('Logged in!', `Hi ${(await response.json()).name}!`);
-      } else {
-        // type === 'cancel'
-      }
-    } catch ({ message }) {
-      alert(`Facebook Login Error: ${message}`);
-    }
+  async componentDidMount() {
+    await Font.loadAsync({
+      Roboto: require('native-base/Fonts/Roboto.ttf'),
+      Roboto_medium: require('native-base/Fonts/Roboto_medium.ttf'),
+      ...Ionicons.font,
+    });
+    this.setState({ isReady: true });
   }
-  render() {
+
+ render() {
+    if (!this.state.isReady) {
+      return <AppLoading />;
+    }
+
     return (
-      <View style={styles.container}>
-        <Button
-          title='Login with Facebook'
-          onPress={this.logIn}
-        />
-      </View>
+      <Container>
+        <SwitchNav/>
+      </Container>
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: 'white',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
